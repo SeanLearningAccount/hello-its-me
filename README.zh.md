@@ -74,7 +74,7 @@ its-me
 显示如下：
 
 ```
-  hello-its-me
+  hello, it's me
   ─────────────────────
 
   Current sounds:
