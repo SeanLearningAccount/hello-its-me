@@ -74,7 +74,7 @@ its-me
 You'll see:
 
 ```
-  hello-its-me
+  hello, it's me
   ─────────────────────
 
   Current sounds:
