@@ -291,7 +291,7 @@ EOF
 main_menu() {
   while true; do
     echo ""
-    echo -e "  ${BOLD}hello-its-me${NC}"
+    echo -e "  ${BOLD}hello, it's me${NC}"
     echo "  ─────────────────────"
     echo ""
     show_current_sounds
