@@ -32,7 +32,7 @@ hello-its-me 响应 Claude Code 的三种事件，并播放对应音效：
 - **python3**（安装脚本依赖）。macOS 通常已自带；如提示找不到，运行 `xcode-select --install`
 - **推荐安装 sox**（用于读取音频时长，详见下方"关于 sox"）：
   ```bash
-    brew install sox
+  brew install sox
   ```
 
 ### 步骤
