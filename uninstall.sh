@@ -52,7 +52,7 @@ hooks = settings.get("hooks", {})
 if not isinstance(hooks, dict):
     hooks = {}
 
-for key in ["Notification", "Stop", "StopFailure"]:
+for key in ["Notification", "Stop", "StopFailure", "PermissionRequest"]:
     hooks.pop(key, None)
 
 if not hooks:
