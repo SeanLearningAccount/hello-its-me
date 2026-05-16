@@ -1,6 +1,6 @@
 # hello-its-me
 
-**English** | [中文](./README.zh.md)
+**English** | [中文](./README.zh.md) | [Changelog](https://github.com/SeanLearningAccount/hello-its-me/releases)
 
 Add audio cues to Claude Code: play a sound when a task completes, when a permission is requested, or when something errors out. Built on Claude Code's official hooks mechanism.
 
@@ -8,11 +8,12 @@ Add audio cues to Claude Code: play a sound when a task completes, when a permis
 
 ## What this is
 
-hello-its-me responds to three Claude Code events and plays a corresponding sound for each:
+hello-its-me responds to four Claude Code events and plays a corresponding sound for each:
 
 | Display name | Hook name in `settings.json` | When it fires |
 |---|---|---|
-| **Notification** | `Notification` | Claude Code needs your input — either to grant a permission, or as an idle reminder after about 60 seconds of inactivity |
+| **Notification** | `Notification` | Idle reminder — fires once after about 60 seconds of inactivity |
+| **Permission** | `PermissionRequest` | Claude Code is asking for your confirmation — e.g. "Do you want to proceed?" |
 | **Complete** | `Stop` | Claude finishes a response |
 | **Error** | `StopFailure` | Claude exits abnormally |
 
@@ -56,8 +57,10 @@ Sounds play through macOS's built-in `afplay` and share the system audio output 
 The installer only touches the three places below. Each is backed up to `.bak.<timestamp>` before any change:
 
 - **Creates** `~/.claude-sounds/` and copies the default sound files into it
-- **Modifies** `~/.claude/settings.json` to register the three hooks
+- **Modifies** `~/.claude/settings.json` to register the four hooks. If you already have a `Notification`, `PermissionRequest`, `Stop`, or `StopFailure` hook configured, it will be overwritten (the file is backed up first).
 - **Modifies** `~/.zshrc` to add an alias for the `its-me` command
+
+> **Note:** `play.sh` stays inside the project directory. If you move or delete the project folder after installing, the hooks will silently stop working. Re-run `bash install.sh` to restore them.
 
 Fully reversible. Uninstall cleans up all the main content. Backup files created before each change are kept — their paths are printed in the terminal when uninstall completes.
 
@@ -124,17 +127,15 @@ Once dropped in, your new files appear under `2. Change sounds` and you can sele
 
 When certain events occur (a response completes, a permission is requested, etc.), Claude Code runs commands configured in the `hooks` field of `~/.claude/settings.json`. This is an official extension point.
 
-hello-its-me binds all three events to the same playback script, varying only the sound file argument:
+hello-its-me binds all four events to the same playback script, varying only the sound file argument:
 
 ```json
 {
   "hooks": {
-    "Notification": [{
-      "matcher": "",
-      "hooks": [{ "type": "command", "command": "bash /path/to/play.sh /path/to/notification-2.wav" }]
-    }],
-    "Stop":         [ /* same structure, with complete sound path */ ],
-    "StopFailure":  [ /* same structure, with error sound path */ ]
+    "Notification":     [{ "matcher": "", "hooks": [{ "type": "command", "command": "bash /path/to/play.sh /path/to/notification.wav" }] }],
+    "PermissionRequest":[{ "matcher": "", "hooks": [{ "type": "command", "command": "bash /path/to/play.sh /path/to/notification.wav" }] }],
+    "Stop":             [{ "matcher": "", "hooks": [{ "type": "command", "command": "bash /path/to/play.sh /path/to/complete.wav" }] }],
+    "StopFailure":      [{ "matcher": "", "hooks": [{ "type": "command", "command": "bash /path/to/play.sh /path/to/error.wav" }] }]
   }
 }
 ```
@@ -146,7 +147,7 @@ When an event fires, `scripts/play.sh`:
 1. Calls `scripts/detect-duration.sh` to read the audio duration (requires sox or ffmpeg — see the next section)
 2. If the duration is ≤ 3 seconds: **plays the sound twice**, with a 0.3-second gap (a single play of a very short sound is easy to miss)
 3. If the duration is > 3 seconds: **plays it once**
-4. Playback uses macOS's built-in `afplay`
+4. Playback uses macOS's built-in `afplay`, capped at 4 seconds. Sounds longer than 4 seconds will be cut off — this is intentional, to keep notifications brief.
 
 ---
 
@@ -185,20 +186,6 @@ brew install sox
 
 ## Known issues / Troubleshooting
 
-### The Notification sound lags several seconds behind the Complete sound
-
-**Symptom**: the Complete sound (`Stop`) plays the instant it fires. The Notification sound (`Notification`) plays with a noticeable delay — around 6 seconds in testing.
-
-**Cause**: this is a known behavior in Claude Code itself. The `Notification` event has a fixed delay between firing and spawning the hook command, while `Stop` does not. The issue has already been reported on GitHub by community members.
-
-**How to verify**: run this directly in your terminal:
-
-```bash
-bash scripts/play.sh ~/.claude-sounds/notification-2.wav
-```
-
-The sound plays instantly, which confirms the delay is not in this project's scripts.
-
 ### Sounds get drowned out by background music
 
 If other software is playing audio at the same time, the sound effect may be hard to hear.
@@ -228,7 +215,7 @@ its-me
 Pick `u. Uninstall`. The uninstaller removes:
 
 - The entire `~/.claude-sounds/` directory
-- The three hooks this project added to `~/.claude/settings.json` (other fields are left untouched)
+- The four hooks this project added to `~/.claude/settings.json` (other fields are left untouched)
 - The `its-me` alias from `~/.zshrc`
 
 As with install, everything is backed up to `.bak.<timestamp>` before removal.
