@@ -145,6 +145,7 @@ sounds = {
     "Notification": os.environ["NOTIFICATION_SOUND"],
     "Stop":         os.environ["COMPLETE_SOUND"],
     "StopFailure":  os.environ["ERROR_SOUND"],
+    "PermissionRequest": os.environ["NOTIFICATION_SOUND"],
 }
 
 def make_hook(sound_path):
