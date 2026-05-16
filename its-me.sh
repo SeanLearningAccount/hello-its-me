@@ -179,8 +179,9 @@ menu_change_sounds() {
     echo "  ─────────────────────"
     echo ""
     echo "    1. Notification sound"
-    echo "    2. Complete sound"
-    echo "    3. Error sound"
+    echo "    2. Permission sound"
+    echo "    3. Complete sound"
+    echo "    4. Error sound"
     echo "    0. Back"
     echo ""
 
@@ -189,10 +190,11 @@ menu_change_sounds() {
 
     case "$input" in
       1) change_one_sound "notification" "Notification" "notification" ;;
-      2) change_one_sound "complete" "Stop" "complete" ;;
-      3) change_one_sound "error" "StopFailure" "error" ;;
+      2) change_one_sound "permission" "PermissionRequest" "notification" ;;
+      3) change_one_sound "complete" "Stop" "complete" ;;
+      4) change_one_sound "error" "StopFailure" "error" ;;
       0) return ;;
-      *) echo -e "  ${YELLOW}Please enter 0–3.${NC}" ;;
+      *) echo -e "  ${YELLOW}Please enter 0–4.${NC}" ;;
     esac
   done
 }
@@ -251,6 +253,7 @@ try:
 
     labels = [
         ("Notification", "Notification"),
+        ("PermissionRequest", "Permission"),
         ("Stop", "Complete"),
         ("StopFailure", "Error"),
     ]
